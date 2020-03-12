@@ -7,27 +7,22 @@ from functools import partial
 
 # This function was made by the previous UDP teams. I simply changed the parameters to the geometry to fit the twitter datat the we received in their
 # latitude and longitude to pass the point function
-    def geometrize_tweets(df):
-        """
-        Convert DataFrame of tweets into GeoDataFrames based on lat/lon coords.
-
-        Parameters
-        ----------
-        data : pd.DataFrame
-            Must contain columns 'lat' and 'lon' containing lat/lon coordinates
-
-        Returns
-        -------
-        gpd.geodataframe.GeoDataFrame
-
-        """
-        # Create a shapely.geometry.Point for each tweet
-
-        geometry = [Point(xy) for xy in zip(df['location.lon'], df['location.lat'])]
-        crs = {'init':'epsg:4326'}
-
-        # Convert to GeoDataFrame, where each tweet's geometry is assigned to the lat/lon coords
-        return gpd.GeoDataFrame(df, crs=crs, geometry=geometry)
+def geometrize_tweets(df):
+    """
+    Convert DataFrame of tweets into GeoDataFrames based on lat/lon coords.
+    Parameters
+    ----------
+    data : pd.DataFrame
+    Must contain columns 'lat' and 'lon' containing lat/lon coordinates
+    Returns
+    -------
+    pd.geodataframe.GeoDataFrame
+    """
+    # Create a shapely.geometry.Point for each tweet
+    geometry = [Point(xy) for xy in zip(df['location.lon'], df['location.lat'])]
+    rs = {'init':'epsg:4326'}
+    # Convert to GeoDataFrame, where each tweet's geometry is assigned to the lat/lon coords
+    return gpd.GeoDataFrame(df, crs=crs, geometry=geometry)
 
 
 
