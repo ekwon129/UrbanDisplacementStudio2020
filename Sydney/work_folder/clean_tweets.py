@@ -20,7 +20,7 @@ def geometrize_tweets(df):
     """
     # Create a shapely.geometry.Point for each tweet
     geometry = [Point(xy) for xy in zip(df['location.lon'], df['location.lat'])]
-    rs = {'init':'epsg:4326'}
+    crs = {'init':'epsg:4326'}
     # Convert to GeoDataFrame, where each tweet's geometry is assigned to the lat/lon coords
     return gpd.GeoDataFrame(df, crs=crs, geometry=geometry)
 
@@ -52,33 +52,29 @@ def geometrize_tweets(df):
 
 
 
-def find_frequencies(series, pat, case=False, ratio=False):
-    """
-    Find the number (or ratio) of times that a pattern occurs in a list of tweets.
-    Parameters
-    ----------
-    series : pd.Series
-        Column of text containing tweets. Must be dtype
-
-    pat : string
-        Regular expression to check against `series`.
-
-    case : boolean (optional, default=False)
-
-        If True, comparisons are case-sensitive (e.g. 'pattern' != 'PaTtErN')
-        If False, comparisons are case-insensitive. (e.g. 'pattern' == 'PaTtErN')
-    ratio : boolean (optional, default=False)
-        If True, return the ratio (number_of_matches) / (number_of_tweets).
-        If False, return a tuple (number_of_matches, number_of_tweets).
-
-    Returns
-    -------
-    integer or float
-    """
-    n = len(series)
-    num_matches = series.str.contains(pat, case=case).sum()
-
-    if ratio:
-        return num_matches / n
-    else:
-        return num_matches, n
+# def find_frequencies(series, pat, case=False, ratio=False):
+#     """
+#     Find the number (or ratio) of times that a pattern occurs in a list of tweets.
+#     Parameters
+#     ----------
+#     series : pd.Series
+#     Column of text containing tweets. Must be dtype
+#     pat : string
+#     Regular expression to check against `series`.
+#     case : boolean (optional, default=False)
+#     If True, comparisons are case-sensitive (e.g. 'pattern' != 'PaTtErN')
+#     If False, comparisons are case-insensitive. (e.g. 'pattern' == 'PaTtErN')
+#     ratio : boolean (optional, default=False)
+#     If True, return the ratio (number_of_matches) / (number_of_tweets).
+#     If False, return a tuple (number_of_matches, number_of_tweets).
+#     Returns
+#     -------
+#     integer or float
+#     """
+#     n = len(series)
+#     num_matches = series.str.contains(pat, case=case).sum()
+#
+#     if ratio:
+#         return num_matches / n
+#     else:
+#         return num_matches, n
