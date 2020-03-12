@@ -26,64 +26,59 @@ def geometrize_tweets(df):
 
 
 
-    def convert_shapefile_crs(shapefile):
-        """
-        Convert shapefile CRS to WGS84 (epsg:4326).
-        Function may take a while to run.
-        Source: https://gis.stackexchange.com/a/127432
-
-        Parameters
-        ----------
-        shapefile : geopandas.GeoDataFrame
-
-        Returns
-        -------
-        shapefile : geopandas.GeoDataFrame
-            Contains updated 'geometry' column
-        """
-        in_proj = pyproj.Proj(shapefile.crs)
-        out_proj = pyproj.Proj(init='epsg:4326')
-
-        project = partial(
-            pyproj.transform,
-            in_proj,
-            out_proj
-        )
-        shapefile['geometry'] = [transform(project, geom) for geom in shapefile['geometry']]
-
-        return shapefile
+# def convert_shapefile_crs(shapefile):
+#     """
+#     Convert shapefile CRS to WGS84 (epsg:4326).
+#     Function may take a while to run.
+#     Source: https://gis.stackexchange.com/a/127432
+#     Parameters
+#     ----------
+#     shapefile : geopandas.GeoDataFrame
+#     Returns
+#     -------
+#     shapefile : geopandas.GeoDataFrame
+#     Contains updated 'geometry' column
+#     """
+#     # create cartographic projections using shapefile to connect to vusalizations and change coordinate reference system
+#     in_proj = pyproj.Proj(shapefile.crs)
+#     out_proj = pyproj.Proj(init='epsg:4326')
+#     project = partial(
+#     pyproj.transform,
+#     in_proj,
+#     out_proj
+#     )
+#     shapefile['geometry'] = [transform(project, geom) for geom in shapefile['geometry']]
+#     return shapefile
 
 
 
-    def find_frequencies(series, pat, case=False, ratio=False):
-        """
-        Find the number (or ratio) of times that a pattern occurs in a list of tweets.
+def find_frequencies(series, pat, case=False, ratio=False):
+    """
+    Find the number (or ratio) of times that a pattern occurs in a list of tweets.
+    Parameters
+    ----------
+    series : pd.Series
+        Column of text containing tweets. Must be dtype
 
-        Parameters
-        ----------
-        series : pd.Series
-            Column of text containing tweets. Must be dtype
+    pat : string
+        Regular expression to check against `series`.
 
-        pat : string
-            Regular expression to check against `series`.
+    case : boolean (optional, default=False)
 
-        case : boolean (optional, default=False)
-            If True, comparisons are case-sensitive (e.g. 'pattern' != 'PaTtErN')
-            If False, comparisons are case-insensitive. (e.g. 'pattern' == 'PaTtErN')
+        If True, comparisons are case-sensitive (e.g. 'pattern' != 'PaTtErN')
+        If False, comparisons are case-insensitive. (e.g. 'pattern' == 'PaTtErN')
+    ratio : boolean (optional, default=False)
+        If True, return the ratio (number_of_matches) / (number_of_tweets).
+        If False, return a tuple (number_of_matches, number_of_tweets).
 
-        ratio : boolean (optional, default=False)
-            If True, return the ratio (number_of_matches) / (number_of_tweets).
-            If False, return a tuple (number_of_matches, number_of_tweets).
+    Returns
+    -------
+    integer or float
+    """
+    n = len(series)
+    num_matches = series.str.contains(pat, case=case).sum()
 
-        Returns
-        -------
-        integer or float
-
-        """
-        n = len(series)
-        num_matches = series.str.contains(pat, case=case).sum()
-
-        if ratio:
-            return num_matches / n
-        else:
-            return num_matches, n
+    if ratio:
+        return num_matches / n
+    else:
+        return num_matches, n
