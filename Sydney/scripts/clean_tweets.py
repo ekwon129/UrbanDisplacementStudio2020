@@ -7,7 +7,7 @@ from functools import partial
 
 # This function was made by the previous UDP teams. I simply changed the parameters to the geometry to fit the twitter datat the we received in their
 # latitude and longitude to pass the point function
-def geometrize_tweets(df):
+    def geometrize_tweets(df):
     """
     Convert DataFrame of tweets into GeoDataFrames based on lat/lon coords.
 
