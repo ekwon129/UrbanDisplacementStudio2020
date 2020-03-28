@@ -33,3 +33,51 @@ def summary_stats(data):
     print("99th percentile of tweets/user: {} tweets".format(pct_99_tweets))
 
     return pct_50_tweets, pct_99_tweets
+
+def filter_and_home_assign(data, shapefile, lower, upper):
+    """
+    Find subset of data to analyze based on lower/upper bounds on tweets/user, 
+    then add home locations.
+    
+    Parameters
+    ----------
+    data : pd.DataFrame or gpd.GeoDataFrame
+        DataFrame containing tweets; must contain column `u_id` for user id
+    
+    shapefile : gpd.GeoDataFrame
+        Shapefile for tracts in tweets location.
+        Must be in WGS84 (epsg:4326) format (to align with tweet lat/lon).
+    
+    lower, upper : int or float
+        Lower (inclusive) and upper (exclusive) bounds on tweets/user.
+        
+    Returns
+    -------
+    filtered : gpd.GeoDataFrame
+        Collection of tweets filtered by lower/upper and with tweet geographies.
+        Contains new columns:
+            - 'timestamp' : pd.Timestamp for time of tweet published
+            - 'date' : date (int) of tweet published
+            - 'hour' : 24-hour (int) of tweet published
+            - 'home' : name of home location codigo (some may be NaN)
+            - 'is_home' : boolean indicating whether tweet was made at home
+    """
+    # Filter based on lower and upper bound on tweets/user
+    filtered = data.groupby('u_id').filter(lambda group: (len(group) >= lower) & (len(group) < upper))
+    
+    # Geometrize tweets (inplace) based on lat/lon
+    filtered = geometrize_tweets(filtered)
+    
+    # Spatial join with tracts
+    filtered = gpd.sjoin(filtered, shapefile, how='left', op='intersects')
+    
+    # Add datetime
+    filtered['timestamp'] = pd.to_datetime(filtered['created_at'] // 1000, unit='s')
+    filtered['date'] = filtered['timestamp'].dt.date
+    filtered['hour'] = filtered['timestamp'].dt.hour
+    
+    # Add home location
+    filtered['home'] = assign_home_location(filtered, SA2='SA2_MAIN16')
+    filtered['is_home'] = filtered['SA2_MAIN16'] == filtered['home']
+    
+    return filtered
