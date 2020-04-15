@@ -24,7 +24,7 @@ def geometrize_tweets(df):
     # Convert to GeoDataFrame, where each tweet's geometry is assigned to the lat/lon coords
     return gpd.GeoDataFrame(df, crs=crs, geometry=geometry)
 
-
+# useless line of code 
 
     def convert_shapefile_crs(shapefile):
         """
